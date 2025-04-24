@@ -1,0 +1,3 @@
+<!-- Use this file to provide workspace-specific custom instructions to Copilot. For more details, visit https://code.visualstudio.com/docs/copilot/copilot-customization#_use-a-githubcopilotinstructionsmd-file -->
+# Copilot Custom Instructions
+This is a Python project implementing a deep learning watermark encoder-decoder system with mixed noise layer (MBRS-DF). Please follow the design plan outlined in the project prompt when generating code.
