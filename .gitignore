@@ -1,0 +1,57 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Virtual environment
+env/
+venv/
+*.env
+
+# PyInstaller
+*.spec
+
+# Test and coverage
+.tox/
+.nox/
+.coverage
+coverage.xml
+htmlcov/
+
+# Jupyter Notebooks
+.ipynb_checkpoints
+
+# IDEs and editors
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# Logs and databases
+*.log
+*.sqlite3
+
+# Checkpoints and model weights
+checkpoints/
+
+
+
+# MacOS
+.DS_Store
+
+# Windows
+Thumbs.db
+
+# Misc
+*.swp
