@@ -104,6 +104,33 @@ class SimpleImageFolder(torch.utils.data.Dataset):
 
 def main():
     args = parse_args()
+    # Load configuration from YAML and override args
+    with open(args.config, "r") as f:
+        cfg = yaml.safe_load(f)
+    args.data_dir = cfg.get("train_data_dir", args.data_dir)
+    args.val_data_dir = cfg.get("val_data_dir", getattr(args, "val_data_dir", None))
+    args.batch_size = cfg.get("batch_size", args.batch_size)
+    args.epochs = cfg.get("epochs", args.epochs)
+    args.lr = cfg.get("lr", args.lr)
+    args.msg_length = cfg.get("msg_length", args.msg_length)
+    args.image_size = cfg.get("image_size", args.image_size)
+    args.train_size = cfg.get("train_size", getattr(args, "train_size", 8000))
+    args.val_size = cfg.get("val_size", getattr(args, "val_size", 2000))
+    args.warmup_epochs = cfg.get("warmup_epochs", args.warmup_epochs)
+    args.adv_start_epoch = cfg.get("adv_start_epoch", args.adv_start_epoch)
+    args.w_pixel = cfg.get("w_pixel", args.w_pixel)
+    args.w_feat = cfg.get("w_feat", args.w_feat)
+    args.w_extract = cfg.get("w_extract", args.w_extract)
+    args.w_adv = cfg.get("w_adv", args.w_adv)
+    args.eval_every = cfg.get("eval_every", args.eval_every)
+    args.threshold = cfg.get("threshold", args.threshold)
+    # Debug: print effective configuration
+    print(f"Config loaded: {cfg}")
+    print(
+        f"Training: {args.data_dir} ({args.train_size}), Validation: {args.val_data_dir} ({args.val_size})"
+    )
+    print(f"Epochs: {args.epochs}, Batch: {args.batch_size}, LR: {args.lr}")
+    # prepare dirs
     os.makedirs("checkpoints", exist_ok=True)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -116,19 +143,14 @@ def main():
     )
     # full training dataset
     full_train = SimpleImageFolder(args.data_dir, transform=transform)
-    # use only first train_size samples from config
-    cfg_train_size = cfg.get("train_size", 8000)
-    train_size = min(cfg_train_size, len(full_train))
+    train_size = min(args.train_size, len(full_train))
     train_dataset = Subset(full_train, list(range(train_size)))
     train_loader = DataLoader(
         train_dataset, batch_size=args.batch_size, shuffle=True, num_workers=4
     )
-    # validation dataset: use only first val_size samples from config
-    # validation directory from config
-    val_dir = cfg.get("val_data_dir")
-    full_val = SimpleImageFolder(val_dir, transform=transform)
-    cfg_val_size = cfg.get("val_size", 2000)
-    val_size = min(cfg_val_size, len(full_val))
+    # validation dataset: use only first val_size samples
+    full_val = SimpleImageFolder(args.val_data_dir, transform=transform)
+    val_size = min(args.val_size, len(full_val))
     val_dataset = Subset(full_val, list(range(val_size)))
     val_loader = DataLoader(
         val_dataset, batch_size=args.batch_size, shuffle=False, num_workers=4
