@@ -283,23 +283,25 @@ def main():
                 }
             )
 
-        # end of epoch
-        print(
-            f"Epoch [{epoch}/{args.epochs}] L_pixel: {l_pixel.item():.4f} L_feat: {l_feat.item():.4f} L_extract: {l_extract.item():.4f}"
-        )
-        # evaluation
-        if (epoch) % args.eval_every == 0:
-            avg_psnr, avg_ssim, robust_ber, fragility_ber = evaluate(
-                encoder,
-                decoder,
-                noise_layer,
-                val_loader,
-                device,
-                threshold=args.threshold,
-            )
+        # end of epoch - skip summary and evaluation during warmup
+        if not is_warmup:
             print(
-                f"Eval Epoch {epoch}: PSNR={avg_psnr:.2f}, SSIM={avg_ssim:.4f}, Robust BER={robust_ber:.4f}, Fragility BER={fragility_ber:.4f}"
+                f"Epoch [{epoch}/{args.epochs}] L_pixel: {l_pixel.item():.4f} "
+                f"L_feat: {l_feat.item():.4f} L_extract: {l_extract.item():.4f}"
             )
+            if epoch % args.eval_every == 0:
+                avg_psnr, avg_ssim, robust_ber, fragility_ber = evaluate(
+                    encoder,
+                    decoder,
+                    noise_layer,
+                    val_loader,
+                    device,
+                    threshold=args.threshold,
+                )
+                print(
+                    f"Eval Epoch {epoch}: PSNR={avg_psnr:.2f}, SSIM={avg_ssim:.4f}, "
+                    f"Robust BER={robust_ber:.4f}, Fragility BER={fragility_ber:.4f}"
+                )
 
         # save checkpoint
         ckpt = {
